@@ -1,0 +1,97 @@
+version: "3"
+#networks:
+#  default:
+#    driver: host
+services:
+#  main:
+#    container_name: sommelier
+#    image: sommelier
+#    network_mode: host
+##    extra_hosts:
+##      - "host.docker.internal:host-gateway"
+#    depends_on:
+#      - db
+#    restart: always
+#    ports:
+#      - "8443:8443"
+#    volumes:
+#      - $HOME/sommelier_server/nginx/files/wine_images:/wine_images
+#      - $HOME/sommelier_server/nginx/files/sign_image:/sign_image
+#      - $HOME/sommelier_server/nginx/files/region_map_image:/region_map_image
+#  sc:
+#    container_name: sommelier-sbercloud
+#    image: sommelier-sbercloud
+#    restart: always
+#    ports:
+#      - "8444:8443"
+#      - "8666:8666"
+#    volumes:
+#      - $HOME/sommelier_server/nginx/files/wine_images:/wine_images
+#      - $HOME/sommelier_server/nginx/files/sign_image:/sign_image
+#      - $HOME/sommelier_server/nginx/files/region_map_image:/region_map_image
+#  robot:
+#    container_name: robot
+#    image: robot
+#    restart: on-failure
+#    ports:
+#      - "8081:8080"
+#      - "8667:8667"
+  db:
+    container_name: sommelier_db
+    image: postgres:11.3
+#    network_mode: host
+    environment:
+      POSTGRES_DB: sommelier
+      POSTGRES_PASSWORD: 11111
+    volumes:
+      - $HOME/docker/volumes/sommelier_db:/var/lib/postgresql/data
+    restart: always
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  nginx:
+    image: nginx:1.17.6
+    container_name: sommelier_nginx
+#    network_mode: host
+    restart: always
+    volumes:
+      - $HOME/sommelier_server/nginx/nginx_conf/nginx.conf:/etc/nginx.conf
+      - $HOME/sommelier_server/nginx/certs:/etc/ssl/certs
+      - $HOME/sommelier_server/nginx/files:/usr/share/nginx/html
+    ports:
+      - "80:80"
+      - "443:443"
+#  pgadmin:
+#    container_name: sommelier-pgadmin
+#    image: dpage/pgadmin4:6
+#    environment:
+#      PGADMIN_DEFAULT_EMAIL: 1@mail.com
+#      PGADMIN_DEFAULT_PASSWORD: postgres
+#      PGADMIN_LISTEN_PORT: 5052
+#    volumes:
+#      - $HOME/sommelier_server/pgadmin/data:/var/lib/pgadmin
+#    ports:
+#      - "8080:5052"
+#    restart: unless-stopped
+#    deploy:
+#      resources:
+#        limits:
+#          cpus: "0.5"
+#          memory: 1G
+
+
+##!/usr/bin/env bash
+
+#cd robot && mvn clean package && cd ..
+#cd sbercloud && mvn -P local clean package && cd ..
+#mvn -P local clean package
+#docker build . --tag sommelier:latest
+#docker build robot --tag robot:latest
+#docker build sbercloud --tag sommelier-sbercloud:latest
+#docker-compose up -d
+#docker image prune -f
+#docker logs -f sommelier
