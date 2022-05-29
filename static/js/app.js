@@ -1,5 +1,6 @@
 var isDoubleClicked = false;
 var circleRadius = 10000;
+var atmTYPE = "category1";
 
 function h3polygon(polygon) {
     const hexagons = h3.polyfill(polygon, 10);
@@ -17,14 +18,28 @@ function postHexagons() {
     
     var dataToML = {
         "h3_list": hexagonsId,
-        "atm_category": "category1"
+        "atm_category": atmTYPE
     };
 
-    xhr.send(JSON.stringify(dataToML));
+    //xhr.send(JSON.stringify(dataToML));
 
-    var response = xhr.response;
+    $.ajax("http://localhost:8080/predict", {
+        beforeSend: function (request) {
+            request.setRequestHeader("accept", '*/*');
+        },
+        type: 'POST',
+        data: { 'h3_list': hexagonsId, 'atm_category': atmTYPE }
+    }).done(function (data) {
+        var response = xhr.response;
+
+        alert(JSON.stringify(response));
     
-    drawHexagons(response.hexagons);
+        drawHexagons(response.hexagons);
+    });
+
+    //var response = xhr.response;
+    
+    //drawHexagons(response.hexagons);
 
 }
 
@@ -209,9 +224,6 @@ function addHexagons() {
 }
 
 function drawHexagons(hexData) {
-    for(var i = 0; i < rectMap.length; i++) {
-        //rectMap[i].
-    }
 
     var minTarget = Infinity;
     var maxTarget = -Infinity;
@@ -295,10 +307,40 @@ window.onclick = function(event) {
 
 // }
 
-function addCircleToMap(e) {
-    var coords = e.get('coords');
 
-    var newCircle = new ymaps.Circle([coords[0], [coords[1]], 10000], { draggable: false });
-
-    myMap.geoObjects.add(newCircle);
+function openTownList() {
+    document.getElementById("myDropdown2").classList.toggle("show");    
 }
+  
+window.onclick = function(event) {
+  if (!event.target.matches('.dropbtn2')) {
+    var dropdowns = document.getElementsByClassName("dropdown-content2");
+    var i;
+    for (i = 0; i < dropdowns.length; i++) {
+      var openDropdown = dropdowns[i];
+      if (openDropdown.classList.contains('show')) {
+        openDropdown.classList.remove('show');
+      }
+    }
+  }
+};
+
+const selectATM = function () {
+    var selectItem = document.getElementsByClassName("atm_item");
+    
+    for(var i = 0; i < selectItem.length; i++) {
+        selectItem[i].addEventListener('click', selectChoose);
+    }
+
+    function selectChoose() {
+        var text = this.innerText;
+        var buttonSelectTown = document.getElementsByClassName("dropbtn2")[0];
+        
+        buttonSelectTown.innerText = text;
+
+        alert(this.value);
+        
+        atmTYPE = "category1";
+    }
+};
+

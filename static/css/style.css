@@ -133,6 +133,9 @@ input[type = "submit"]:hover {
     padding: 12px 16px;
     text-decoration: none;
     display: block;
+    font-size: 20px;
+    font-family: 'Inter', sans-serif;
+    text-align: center;
 }
   
   /* Изменение цвета выпадающих ссылок при наведении курсора */
