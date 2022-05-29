@@ -20,7 +20,7 @@ function postHexagons() {
         "atm_category": "category1"
     };
 
-    xhr.send(dataToML);
+    xhr.send(JSON.stringify(dataToML));
 
     var response = xhr.response;
     
