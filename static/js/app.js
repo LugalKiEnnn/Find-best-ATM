@@ -24,6 +24,7 @@ function postHexagons() {
 
     var response = xhr.response;
     
+    drawHexagons(response.hexagons);
 
 }
 
@@ -204,53 +205,37 @@ function addHexagons() {
         }
 
         drawHexagons(hexagonsId);
-
-        // for(var i = 0; i < hexagonsId.length; i++) {
-        //     const hexBoundary = h3.h3ToGeoBoundary(hexagonsId[i]);
-
-        //     var polygon = new ymaps.Polygon([
-        //             // Координаты внешнего контура.
-        //         hexBoundary
-        //     ], {
-        //         hintContent: "Многоугольник"
-        //     }, {
-        //         fillColor: '#6699ff',
-        //         // Делаем полигон прозрачным для событий карты.
-        //         interactivityModel: 'default#transparent',
-        //         strokeWidth: 2,
-        //         opacity: 0.5
-        //     });
-        //     myMap.geoObjects.add(polygon);
-        //     // myMap.setBounds(polygon.geometry.getBounds());
-
-        // }
     }
 }
 
 function drawHexagons(hexData) {
-    // var minTarget = Infinity;
-    // var maxTarget = -Infinity;
-    // for(var i = 0; i < hexData.length; i++) {
-    //     if(hexData.target > maxTarget) {
-    //         maxTarget = hexData.target;
-    //     }
-    //     if(hexData.target < minTarget) {
-    //         minTarget = hexData.target;
-    //     }
-    // }
+    for(var i = 0; i < rectMap.length; i++) {
+        //rectMap[i].
+    }
+
+    var minTarget = Infinity;
+    var maxTarget = -Infinity;
+    for(var i = 0; i < hexData.length; i++) {
+        if(hexData[i].target > maxTarget) {
+            maxTarget = hexData.target;
+        }
+        if(hexData.target[i] < minTarget) {
+            minTarget = hexData.target;
+        }
+    }
 
     for(var i = 0; i < hexData.length; i++) {
-        const hexBoundary = h3.h3ToGeoBoundary(hexData[i]);
+        const hexBoundary = h3.h3ToGeoBoundary(hexData[i].index);
 
-        // var hexColor = hsl(4, hexData.target / maxTarget * 100 ,94);
+        var hexColor = hsl(4, hexData[i].target / maxTarget * 100 ,94);
 
         var polygon = new ymaps.Polygon([
                 // Координаты внешнего контура.
             hexBoundary
         ], {
-            balloonContent: "Target"
+            balloonContent: hexData[i].target
         }, {
-            fillColor: '#6699ff',
+            fillColor: hexColor,
             // Делаем полигон прозрачным для событий карты.
             interactivityModel: 'default#transparent',
             strokeWidth: 2,
