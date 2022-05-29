@@ -8,13 +8,14 @@ function h3polygon(polygon) {
 }
 
 function postHexagons() {
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", "http://localhost:8080/predict");
-    
-    xhr.setRequestHeader("Accept", "application/json");
-    xhr.setRequestHeader("Content-Type", "application/json");
-    
-    xhr.onload = () => console.log(xhr.responseText);
+    addHexagons();
+    // var xhr = new XMLHttpRequest();
+    // xhr.open("POST", "http://localhost:8080/predict");
+    //
+    // xhr.setRequestHeader("Accept", "application/json");
+    // xhr.setRequestHeader("Content-Type", "application/json");
+    //
+    // xhr.onload = () => console.log(xhr.responseText);
     
     var dataToML = {
         "h3_list": hexagonsId,
@@ -25,16 +26,15 @@ function postHexagons() {
 
     $.ajax("http://localhost:8080/predict", {
         beforeSend: function (request) {
-            request.setRequestHeader("accept", '*/*');
+            request.setRequestHeader("Accept", '*/*');
+            request.setRequestHeader("Access-Control-Allow-Origin", "*");
+            request.setRequestHeader("Content-Type", "application/json");
         },
         type: 'POST',
-        data: { 'h3_list': hexagonsId, 'atm_category': atmTYPE }
+        crossDomain: true,
+        data: JSON.stringify(dataToML)
     }).done(function (data) {
-        var response = xhr.response;
-
-        alert(JSON.stringify(response));
-    
-        drawHexagons(response.hexagons);
+        drawHexagons(JSON.parse(data).hexagons);
     });
 
     //var response = xhr.response;
@@ -188,12 +188,13 @@ function init() {
 
         rectMap.push(newRectangle);
 
-        addHexagons();
+
 
     });
 
     myMap.controls.add(listBox, {float: 'left'});
     selectTown();
+    selectATM();
 }
 
 function addHexagons() {
@@ -217,9 +218,37 @@ function addHexagons() {
             const hexagons = h3polygon(polygon);
 
             hexagonsId = [...new Set(hexagons)];
+
+            // hexagonsId.push(hexagons);
+            // hexagonsId = Array.from(new Set(hexagonsId));
         }
 
-        drawHexagons(hexagonsId);
+        //drawHexagons(hexagonsId);
+    }
+}
+
+function getColor(targetH, maxT,minT) {
+    var a = (targetH-minT) / (maxT-minT) * 100;
+    if (a < 5) {
+        return "#EFE4E3";
+    } else if (a < 15) {
+        return "#EFCBC9";
+    }else if (a < 25) {
+        return "#EFB7B3";
+    }else if (a < 35) {
+        return "#EFA19B";
+    }else if (a < 45) {
+        return "#EF8A83";
+    }else if (a < 60) {
+        return "#EF6960";
+    }else if (a < 70) {
+        return "#EF5248";
+    }else if (a < 80) {
+        return "#EF3C30";
+    }else if (a < 90) {
+        return "#EF2618";
+    } else {
+        return "#F00F00";
     }
 }
 
@@ -229,17 +258,17 @@ function drawHexagons(hexData) {
     var maxTarget = -Infinity;
     for(var i = 0; i < hexData.length; i++) {
         if(hexData[i].target > maxTarget) {
-            maxTarget = hexData.target;
+            maxTarget = hexData[i].target;
         }
-        if(hexData.target[i] < minTarget) {
-            minTarget = hexData.target;
+        if(hexData[i].target < minTarget) {
+            minTarget = hexData[i].target;
         }
     }
 
     for(var i = 0; i < hexData.length; i++) {
         const hexBoundary = h3.h3ToGeoBoundary(hexData[i].index);
 
-        var hexColor = hsl(4, hexData[i].target / maxTarget * 100 ,94);
+        //var hexColor = hslToRgb(4, hexData[i].target / maxTarget * 100 ,94);
 
         var polygon = new ymaps.Polygon([
                 // Координаты внешнего контура.
@@ -247,7 +276,7 @@ function drawHexagons(hexData) {
         ], {
             balloonContent: hexData[i].target
         }, {
-            fillColor: hexColor,
+            fillColor: getColor(hexData[i].target,maxTarget, minTarget),
             // Делаем полигон прозрачным для событий карты.
             interactivityModel: 'default#transparent',
             strokeWidth: 2,
@@ -308,7 +337,7 @@ window.onclick = function(event) {
 // }
 
 
-function openTownList() {
+function openAtmList() {
     document.getElementById("myDropdown2").classList.toggle("show");    
 }
   
@@ -327,6 +356,7 @@ window.onclick = function(event) {
 
 const selectATM = function () {
     var selectItem = document.getElementsByClassName("atm_item");
+
     
     for(var i = 0; i < selectItem.length; i++) {
         selectItem[i].addEventListener('click', selectChoose);
@@ -337,10 +367,19 @@ const selectATM = function () {
         var buttonSelectTown = document.getElementsByClassName("dropbtn2")[0];
         
         buttonSelectTown.innerText = text;
+        if(text === "Общий доступ") {
+            atmTYPE = "category1";
+        }
+        if(text === "ЗП") {
+            atmTYPE = "category2";
+        }
+        if(text === "Отделение") {
+            atmTYPE = "category3";
+        }
+        if(text === "Самоинкассация") {
+            atmTYPE = "category4";
+        }
 
-        alert(this.value);
-        
-        atmTYPE = "category1";
     }
 };
 
