@@ -73,9 +73,29 @@ input[type = "submit"]:hover {
     transition: 0.20s;
     cursor: pointer;
   }
+
+.dropbtn2 {
+    background: none;
+    font-weight: 700;
+    display: block;
+    margin: 20px auto;
+    text-align: center;
+    border: 2px solid #CCC;
+    padding: 14px 40px;
+    outline: none;
+    color: #CCC;
+    border-radius: 25px;
+    transition: 0.20s;
+    cursor: pointer;
+    }
   
   /* Кнопка выпадающего меню при наведении и фокусировке */
   .dropbtn:hover {
+      background: #CCC;
+      color: #34495e;
+  }
+
+  .dropbtn2:hover {
       background: #CCC;
       color: #34495e;
   }
@@ -91,6 +111,11 @@ input[type = "submit"]:hover {
     display: none;
     background-color: #CCC;
   }
+
+.dropdown-content2 {
+    display: none;
+    background-color: #CCC;
+}
   
   /* Ссылки внутри выпадающего списка */
   .dropdown-content .town_item {
@@ -102,6 +127,13 @@ input[type = "submit"]:hover {
     font-family: 'Inter', sans-serif;
     text-align: center;
   }
+
+.dropdown-content2 .atm_item {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
   
   /* Изменение цвета выпадающих ссылок при наведении курсора */
   .dropdown-content .town_item:hover {
@@ -109,6 +141,12 @@ input[type = "submit"]:hover {
       border-width: 1px;
       border-color: #666;
   }
+
+.dropdown-content2 .atm_item:hover {
+    background-color: #666;
+    border-width: 1px;
+    border-color: #666;
+}
   
   /* Показать выпадающее меню (используйте JS, чтобы добавить этот класс .dropdown-content содержимого, когда пользователь нажимает на кнопку выпадающего списка) */
   .show {display:block;}
