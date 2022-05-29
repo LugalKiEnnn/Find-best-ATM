@@ -1,34 +1,48 @@
-const townsCoordinates = [
-    { 
-        name: "Moscow",
-        coordX: 55.76,
-        coordY: 37.64
-    },
-    { 
-        name: "Saint-P",
-        coordX: 55.76,
-        coordY: 37.64
-    },
-    { 
-        name: "Novgorod",
-        coordX: 55.76,
-        coordY: 37.64
-    }
-];
+var isDoubleClicked = false;
+var circleRadius = 10000;
 
-//var myMap;
+function h3polygon(polygon) {
+    const hexagons = h3.polyfill(polygon, 10);
+    return hexagons;
+}
 
+function postHexagons() {
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "http://localhost:8080/predict");
+    
+    xhr.setRequestHeader("Accept", "application/json");
+    xhr.setRequestHeader("Content-Type", "application/json");
+    
+    xhr.onload = () => console.log(xhr.responseText);
+    
+    var dataToML = {
+        "h3_list": hexagonsId,
+        "atm_category": "category1"
+    };
+
+    xhr.send(dataToML);
+
+    var response = xhr.response;
+    
+
+}
+
+var myMap;
+var rectMap = [];
+var hexagonsId = [];
 ymaps.ready(init);
 
 function init() {
+
+
     myMap = new ymaps.Map("map", {
             center: [55.76, 37.64],
             // Уровень масштабирования. Допустимые значения:
             // от 0 (весь мир) до 19.
-            zoom: 9,
+            zoom: 15,
             controls: ['zoomControl']
-        }),
-        ListBoxLayout = ymaps.templateLayoutFactory.createClass(
+        });
+    var ListBoxLayout = ymaps.templateLayoutFactory.createClass(
             "<button id='my-listbox-header' class='btn btn-success dropdown-toggle' data-toggle='dropdown' style='display: none'>" +
                 "{{data.title}} <span class='caret'></span>" +
             "</button>" +
@@ -86,28 +100,28 @@ function init() {
                 data: {
                     content: 'Москва',
                     center: [55.751574, 37.573856],
-                    zoom: 9
+                    zoom: 15
                 }
             }),
             new ymaps.control.ListBoxItem({
                 data: {
                     content: 'Санкт-Петербург',
                     center: [59.94, 30.32],
-                    zoom: 9
+                    zoom: 15
                 }
             }),
             new ymaps.control.ListBoxItem({
                 data: {
                     content: 'Новосибирск',
                     center: [55.00835, 82.93573],
-                    zoom: 9
+                    zoom: 15
                 }
             }),
             new ymaps.control.ListBoxItem({
                 data: {
                     content: 'Екатеринбург',
                     center: [56.8519, 60.6122],
-                    zoom: 9
+                    zoom: 15
                 }
             }),
         ],
@@ -141,9 +155,114 @@ function init() {
                 );
             }
         });
+
+    myMap.behaviors.disable('dblClickZoom');
+
+    myMap.events.add('dblclick', function (e) {
+        var coords = e.get('coords');
+
+        var leftB = coords[1] - 0.000001 * circleRadius;
+        var rightB = coords[1] + 0.000001 * circleRadius;
+        var topB = coords[0] + 0.0000005 * circleRadius;
+        var botB = coords[0] - 0.0000005 * circleRadius;
+
+        var newRectangle = new ymaps.Rectangle([[botB,leftB],[topB,rightB]], null, { draggable: false,fillColor: "#DB709330" });
+
+        myMap.geoObjects.add(newRectangle);
+
+        rectMap.push(newRectangle);
+
+        addHexagons();
+
+    });
+
     myMap.controls.add(listBox, {float: 'left'});
     selectTown();
 }
+
+function addHexagons() {
+    if (rectMap.length > 0) {
+        
+
+        for(var i = 0; i < rectMap.length; i++) {
+            var bounds = rectMap[i].geometry.getBounds();
+            var leftB = bounds[0][1];
+            var rightB = bounds[1][1];
+            var topB = bounds[1][0];
+            var botB = bounds[0][0];
+
+            const polygon = [
+                [botB,leftB],
+                [botB,rightB],
+                [topB,rightB],
+                [topB,leftB]
+            ];  
+
+            const hexagons = h3polygon(polygon);
+
+            hexagonsId = [...new Set(hexagons)];
+        }
+
+        drawHexagons(hexagonsId);
+
+        // for(var i = 0; i < hexagonsId.length; i++) {
+        //     const hexBoundary = h3.h3ToGeoBoundary(hexagonsId[i]);
+
+        //     var polygon = new ymaps.Polygon([
+        //             // Координаты внешнего контура.
+        //         hexBoundary
+        //     ], {
+        //         hintContent: "Многоугольник"
+        //     }, {
+        //         fillColor: '#6699ff',
+        //         // Делаем полигон прозрачным для событий карты.
+        //         interactivityModel: 'default#transparent',
+        //         strokeWidth: 2,
+        //         opacity: 0.5
+        //     });
+        //     myMap.geoObjects.add(polygon);
+        //     // myMap.setBounds(polygon.geometry.getBounds());
+
+        // }
+    }
+}
+
+function drawHexagons(hexData) {
+    // var minTarget = Infinity;
+    // var maxTarget = -Infinity;
+    // for(var i = 0; i < hexData.length; i++) {
+    //     if(hexData.target > maxTarget) {
+    //         maxTarget = hexData.target;
+    //     }
+    //     if(hexData.target < minTarget) {
+    //         minTarget = hexData.target;
+    //     }
+    // }
+
+    for(var i = 0; i < hexData.length; i++) {
+        const hexBoundary = h3.h3ToGeoBoundary(hexData[i]);
+
+        // var hexColor = hsl(4, hexData.target / maxTarget * 100 ,94);
+
+        var polygon = new ymaps.Polygon([
+                // Координаты внешнего контура.
+            hexBoundary
+        ], {
+            balloonContent: "Target"
+        }, {
+            fillColor: '#6699ff',
+            // Делаем полигон прозрачным для событий карты.
+            interactivityModel: 'default#transparent',
+            strokeWidth: 2,
+            opacity: 0.5
+        });
+        myMap.geoObjects.add(polygon);
+        // myMap.setBounds(polygon.geometry.getBounds());
+
+    }
+}
+
+// ymaps.ready(init);
 
 const selectTown = function () {
     var selectItem = document.getElementsByClassName("town_item");
@@ -186,3 +305,15 @@ window.onclick = function(event) {
     }
   }
 };
+
+// function addCircleToMap() {
+
+// }
+
+function addCircleToMap(e) {
+    var coords = e.get('coords');
+
+    var newCircle = new ymaps.Circle([coords[0], [coords[1]], 10000], { draggable: false });
+
+    myMap.geoObjects.add(newCircle);
+}
