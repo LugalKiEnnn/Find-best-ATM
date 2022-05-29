@@ -27,19 +27,15 @@ body {
 .leftMenu {
     background: #666;
     /*border-top-right-radius: 30px;*/
-    border-bottom-right-radius: 30px;
+    border-bottom-left-radius: 30px;
     position: absolute;
     z-index: 99999;
     top: 0;
     left: 0;
-    height: 80%;
+    margin-bottom: 20%;
+    margin-left: 82%;
     width: 18%;
 }
-
-/*
-.leftMenu:hover {
-    width: 20%;
-}*/
 
 /* Стиль кнопки "Показать" */
 .box input[type = "submit"] {
@@ -64,12 +60,6 @@ body {
 }
 
 .dropbtn {
-    /*background-color: #3498DB;*/
-    /*color: white;*/
-    /*padding: 16px;*/
-    /*font-size: 16px;*/
-    /*border: none;*/
-    /*cursor: pointer;*/
     background: none;
     font-weight: 700;
     display: block;
