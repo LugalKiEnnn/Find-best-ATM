@@ -21,18 +21,45 @@ body {
     overflow: hidden;
     width: 80%;
     height: 99%;
-    margin-left: 20%;
 
   }
 
 .leftMenu {
-    border: 1px solid #aaa;
+    background: #666;
+    /*border-top-right-radius: 30px;*/
+    border-bottom-right-radius: 30px;
     position: absolute;
     z-index: 99999;
     top: 0;
     left: 0;
-    height: 99%;
+    height: 80%;
     width: 20%;
+}
+/*
+.leftMenu:hover {
+    width: 20%;
+}*/
+
+/* Стиль кнопки "Показать" */
+.box input[type = "submit"] {
+    background: none;
+    font-weight: 700;
+    display: block;
+    margin: 20px auto;
+    text-align: center;
+    border: 2px solid #CCC;
+    padding: 14px 40px;
+    outline: none;
+    color: #CCC;
+    border-radius: 25px;
+    transition: 0.20s;
+    cursor: pointer;
+}
+
+/* Стиль кнопки "Показать" после наведения мыши */
+.box input[type = "submit"]:hover {
+    background: #CCC;
+    color: #34495e;
 }
 
 .dropbtn {
