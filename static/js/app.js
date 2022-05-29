@@ -99,10 +99,17 @@ function init() {
             new ymaps.control.ListBoxItem({
                 data: {
                     content: 'Новосибирск',
-                    center: [54.990215, 73.365535],
+                    center: [55.00835, 82.93573],
                     zoom: 9
                 }
-            })
+            }),
+            new ymaps.control.ListBoxItem({
+                data: {
+                    content: 'Екатеринбург',
+                    center: [56.8519, 60.6122],
+                    zoom: 9
+                }
+            }),
         ],
 
         // Теперь создадим список, содержащий 2 пункта.
